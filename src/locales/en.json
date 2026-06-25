@@ -1,0 +1,49 @@
+{
+  "home": {
+    "title1": "Find ",
+    "title2": "Movies",
+    "title3": " You'll Enjoy Without the Hassle",
+    "trending": "Trending Movies",
+    "all_movies": "All Movies",
+    "search_placeholder": "Search through thousands of movies"
+  },
+  "movie": {
+    "release_year": "Release Year:",
+    "runtime": "Runtime:",
+    "minutes": "min",
+    "rating": "Rating:",
+    "genres": "Genres:",
+    "tagline": "Tagline:",
+    "overview": "Overview:",
+    "cast": "Top Cast:",
+    "similar": "Similar Movies:"
+  },
+  "common": {
+    "switch_lang": "العربية",
+    "no_movies": "No movies found."
+  },
+  "error": {
+    "fetch_movies": "Error fetching movies. Please try again later.",
+    "fetch_details": "Error fetching movie details. Please try again later.",
+    "fetch_trending": "Error fetching trending movies."
+  },
+  "nav": {
+    "home": "Home",
+    "developer": "Developer"
+  },
+  "sort": {
+    "popular": "Popular",
+    "top_rated": "Top Rated",
+    "newest": "Newest"
+  },
+  "footer": {
+    "description": "An advanced cinematic platform allowing you to discover and search for the latest movies effortlessly. Built with modern web technologies.",
+    "job_title": "Software Engineer",
+    "dev_desc": "Specialized in building modern web and mobile applications with clean and modern architectures.",
+    "rights": "All rights reserved.",
+    "developed_by": "Developed with love and passion by"
+  },
+  "genre": {
+    "all": "All"
+  }
+}
