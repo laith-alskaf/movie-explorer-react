@@ -36,6 +36,11 @@ const useMovieStore = create((set, get) => ({
   // ═══════════════════════════════════════════════════════════
 
   /**
+   * نوع العمل الفني: 'movie' للأفلام، 'tv' للمسلسلات.
+   */
+  mediaType: 'movie',
+
+  /**
    * نص البحث الذي يكتبه المستخدم في صندوق البحث.
    * يتغير فوراً مع كل حرف يكتبه المستخدم.
    */
@@ -48,6 +53,13 @@ const useMovieStore = create((set, get) => ({
   selectedGenreId: '',
 
   /**
+   * فلاتر متقدمة إضافية (Advanced Filters)
+   */
+  filterYear: '',
+  filterRating: 0,
+  filterLanguage: '',
+
+  /**
    * خيار الترتيب المختار للأفلام.
    * القيم المتاحة: 'popularity.desc' | 'vote_average.desc' | 'primary_release_date.desc'
    */
@@ -58,6 +70,21 @@ const useMovieStore = create((set, get) => ({
    * تتغير عند: البحث، تغيير التصنيف، تغيير الترتيب.
    */
   movies: [],
+
+  /**
+   * الصفحة الحالية للتمرير اللانهائي.
+   */
+  page: 1,
+
+  /**
+   * هل يوجد صفحات أخرى للتحميل؟
+   */
+  hasMore: true,
+
+  /**
+   * هل يتم تحميل صفحة إضافية حالياً؟
+   */
+  isLoadingMore: false,
 
   /**
    * قائمة التصنيفات الرسمية المجلوبة من TMDB API.
@@ -87,7 +114,7 @@ const useMovieStore = create((set, get) => ({
    * 🧠 لاحظ: set({ searchTerm: term }) تُحدّث فقط searchTerm
    *    وتترك باقي الحالات كما هي — هذا الدمج التلقائي (Auto Merge) ميزة من Zustand.
    */
-  setSearchTerm: (term) => set({ searchTerm: term }),
+  setSearchTerm: (term) => set({ searchTerm: term, page: 1, hasMore: true }),
 
   /**
    * تحديث التصنيف المختار.
@@ -97,24 +124,49 @@ const useMovieStore = create((set, get) => ({
   setSelectedGenreId: (genreId) => set({
     selectedGenreId: genreId,
     searchTerm: '',  // مسح البحث عند تغيير التصنيف
+    page: 1,
+    hasMore: true
+  }),
+
+  /**
+   * تحديث الفلاتر المتقدمة
+   */
+  setFilters: (filters) => set((state) => ({
+    ...filters,
+    page: 1,
+    hasMore: true
+  })),
+
+  /**
+   * تحديث نوع العمل (أفلام/مسلسلات).
+   * يمسح البحث والتصنيفات ويعود للصفحة الأولى لضمان التبديل النظيف.
+   */
+  setMediaType: (type) => set({
+    mediaType: type,
+    searchTerm: '',
+    selectedGenreId: '',
+    filterYear: '',
+    filterRating: 0,
+    filterLanguage: '',
+    sortBy: 'popularity.desc',
+    page: 1,
+    hasMore: true,
+    movies: []
   }),
 
   /**
    * تحديث خيار الترتيب (شعبية، تقييم، أحدث).
    */
-  setSortBy: (sort) => set({ sortBy: sort }),
+  setSortBy: (sort) => set({ sortBy: sort, page: 1, hasMore: true }),
 
   /**
-   * جلب قائمة التصنيفات الرسمية من TMDB API.
-   * تُستدعى مرة واحدة عند تحميل الصفحة الرئيسية.
-   *
-   * 🧠 لماذا async؟
-   *   لأنها تتصل بالإنترنت (API Call) — والنتيجة لا تأتي فوراً.
-   *   await تجعل الكود ينتظر حتى تصل البيانات قبل تحديث الحالة.
+   * جلب قائمة التصنيفات الرسمية من TMDB API بناءً على نوع العمل.
+   * تُستدعى عند تحميل الصفحة الرئيسية أو عند تغيير نوع العمل.
    */
   fetchGenres: async () => {
+    const { mediaType } = get();
     try {
-      const data = await tmdbService.fetchGenres();
+      const data = await tmdbService.fetchGenres(mediaType);
       set({ genres: data });
     } catch (err) {
       console.error('[MovieStore] Error loading genres:', err);
@@ -134,33 +186,50 @@ const useMovieStore = create((set, get) => ({
    */
   fetchMovies: async () => {
     // 1. نقرأ الحالة الحالية
-    const { searchTerm, selectedGenreId, sortBy } = get();
+    const { searchTerm, selectedGenreId, sortBy, page, mediaType, filterYear, filterRating, filterLanguage } = get();
 
     // 2. نبدأ التحميل ونمسح أي أخطاء سابقة
-    set({ isLoading: true, errorMessage: '' });
+    if (page === 1) {
+      set({ isLoading: true, errorMessage: '' });
+    } else {
+      set({ isLoadingMore: true });
+    }
 
     try {
       // 3. نحدد نوع الطلب: بحث نصي أم تصفح عام
-      const results = searchTerm
-        ? await tmdbService.searchMovies(searchTerm)
-        : await tmdbService.fetchPopularMovies(selectedGenreId, sortBy);
+      const data = searchTerm
+        ? await tmdbService.searchMedia(searchTerm, mediaType, page)
+        : await tmdbService.fetchPopularMedia(mediaType, selectedGenreId, sortBy, page, filterYear, filterRating, filterLanguage);
 
       // 4. نحفظ النتائج في المتجر
-      set({ movies: results });
+      set((state) => ({ 
+        movies: page === 1 ? data.results : [...state.movies, ...data.results],
+        hasMore: page < data.totalPages
+      }));
 
-      // 5. تحديث إحصائيات البحث في Appwrite (فقط عند البحث النصي)
-      if (searchTerm && results.length > 0) {
-        await updateSearchCount(searchTerm, results[0]);
+      // 5. تحديث إحصائيات البحث في Appwrite (فقط عند البحث النصي والصفحة الأولى)
+      if (searchTerm && data.results.length > 0 && page === 1) {
+        await updateSearchCount(searchTerm, data.results[0]);
       }
     } catch (error) {
       console.error('[MovieStore] fetchMovies failed:', error);
       set({
-        errorMessage: i18n.t('error.fetch_movies'),
-        movies: [],
+        errorMessage: page === 1 ? i18n.t('error.fetch_movies') : '',
       });
     } finally {
       // 6. ننهي التحميل دائماً (سواء نجح أو فشل)
-      set({ isLoading: false });
+      set({ isLoading: false, isLoadingMore: false });
+    }
+  },
+
+  /**
+   * تحميل الصفحة التالية للتمرير اللانهائي.
+   */
+  loadMoreMovies: () => {
+    const { hasMore, isLoading, isLoadingMore, page, fetchMovies } = get();
+    if (hasMore && !isLoading && !isLoadingMore) {
+      set({ page: page + 1 });
+      fetchMovies();
     }
   },
 }));

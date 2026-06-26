@@ -38,12 +38,51 @@
   },
   "footer": {
     "description": "An advanced cinematic platform allowing you to discover and search for the latest movies effortlessly. Built with modern web technologies.",
+    "sub_description": "This platform was built to provide a unique cinematic browsing experience combining high performance and attractive design.",
     "job_title": "Software Engineer",
-    "dev_desc": "Specialized in building modern web and mobile applications with clean and modern architectures.",
+    "dev_desc": "I transform complex ideas into smooth, professional user interfaces. Contact me to build your next project.",
     "rights": "All rights reserved.",
-    "developed_by": "Developed with love and passion by"
+    "developed_by": "Developed with love and passion by",
+    "quick_links": "Quick Links",
+    "home": "Home",
+    "favorites": "Favorites",
+    "source_code": "Source Code",
+    "contact_dev": "Contact Developer",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service"
   },
   "genre": {
     "all": "All"
+  },
+  "features": {
+    "watch_providers": "Where to watch?",
+    "image_gallery": "Image Gallery",
+    "seasons": "Seasons & Episodes",
+    "biography": "Biography",
+    "top_credits": "Known For",
+    "episodes": "Episodes",
+    "season": "Season",
+    "seasons_count": "Seasons",
+    "advanced_filters": "Advanced Filters",
+    "hide_filters": "Hide Advanced Filters",
+    "release_year": "Release Year",
+    "min_rating": "Min Rating",
+    "language": "Language",
+    "any_year": "Any Year",
+    "any_rating": "Any Rating",
+    "clear_filters": "Clear Filters",
+    "load_more": "Load More",
+    "loading": "Loading...",
+    "all_series": "All TV Shows",
+    "premium_exp": "Premium Experience",
+    "movies": "Movies",
+    "tv_shows": "TV Shows",
+    "watch_trailer": "Watch Trailer",
+    "trailer_unavailable": "Trailer Unavailable",
+    "remove_favorite": "Remove from Favorites",
+    "add_favorite": "Add to Favorites",
+    "back": "Back",
+    "back_to_home": "Back to Home",
+    "role": "Role"
   }
 }

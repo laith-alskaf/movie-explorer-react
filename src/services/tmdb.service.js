@@ -49,55 +49,77 @@ const _fetchFromTMDB = async (endpoint) => {
  */
 const tmdbService = {
   /**
-   * جلب الأفلام الأكثر شعبية (الصفحة الرئيسية بدون بحث).
-   * @param {number|string} [genreId=''] - معرف التصنيف الاختياري للفلترة
-   * @param {string} [sortBy='popularity.desc'] - خيار الترتيب المختار
-   * @returns {Promise<Movie[]>}
+   * جلب الأعمال الأكثر شعبية (أفلام أو مسلسلات) مع فلاتر.
+   * @param {string} [mediaType='movie']
+   * @param {number|string} [genreId='']
+   * @param {string} [sortBy='popularity.desc']
+   * @param {number} [page=1]
+   * @param {string} [filterYear='']
+   * @param {number|string} [filterRating=0]
+   * @param {string} [filterLanguage='']
+   * @returns {Promise<{results: any[], totalPages: number}>}
    */
-  fetchPopularMovies: async (genreId = '', sortBy = 'popularity.desc') => {
+  fetchPopularMedia: async (mediaType = 'movie', genreId = '', sortBy = 'popularity.desc', page = 1, filterYear = '', filterRating = 0, filterLanguage = '') => {
     const genreQuery = genreId ? `&with_genres=${genreId}` : '';
-    // لتفادي ظهور أفلام غير معروفة مقيمة 10/10 بتقييم واحد، نضع حداً أدنى للأصوات عند الترتيب بالتقييم
-    const voteCountQuery = sortBy.includes('vote_average') ? '&vote_count.gte=300' : '';
+    // لتفادي ظهور أعمال مقيمة 10/10 بتقييم واحد، نضع حداً أدنى للأصوات عند الترتيب بالتقييم
+    const voteCountQuery = (sortBy.includes('vote_average') || filterRating > 0) ? '&vote_count.gte=300' : '';
+    const yearQuery = filterYear ? (mediaType === 'movie' ? `&primary_release_year=${filterYear}` : `&first_air_date_year=${filterYear}`) : '';
+    const ratingQuery = filterRating > 0 ? `&vote_average.gte=${filterRating}` : '';
+    const languageQuery = filterLanguage ? `&with_original_language=${filterLanguage}` : '';
     
     const data = await _fetchFromTMDB(
-      `${API_BASE_URL}/discover/movie?sort_by=${sortBy}${genreQuery}${voteCountQuery}`
+      `${API_BASE_URL}/discover/${mediaType}?sort_by=${sortBy}${genreQuery}${voteCountQuery}${yearQuery}${ratingQuery}${languageQuery}&page=${page}`
     );
-    return data.results ?? [];
+    return { results: data.results ?? [], totalPages: data.total_pages };
   },
 
   /**
-   * جلب قائمة التصنيفات الرسمية للأفلام.
+   * جلب قائمة التصنيفات الرسمية.
+   * @param {string} [mediaType='movie'] - نوع العمل
    * @returns {Promise<Genre[]>}
    */
-  fetchGenres: async () => {
+  fetchGenres: async (mediaType = 'movie') => {
     const data = await _fetchFromTMDB(
-      `${API_BASE_URL}/genre/movie/list`
+      `${API_BASE_URL}/genre/${mediaType}/list`
     );
     return data.genres ?? [];
   },
 
   /**
-   * البحث عن أفلام بكلمة مفتاحية.
-   * encodeURIComponent: تحوّل النص إلى صيغة آمنة للـ URL (مثلاً المسافات تصبح %20)
+   * البحث عن أعمال بكلمة مفتاحية.
    * @param {string} query - نص البحث
-   * @returns {Promise<Movie[]>}
+   * @param {string} [mediaType='movie'] - نوع العمل
+   * @param {number} [page=1] - رقم الصفحة
+   * @returns {Promise<{results: any[], totalPages: number}>}
    */
-  searchMovies: async (query) => {
+  searchMedia: async (query, mediaType = 'movie', page = 1) => {
     const data = await _fetchFromTMDB(
-      `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+      `${API_BASE_URL}/search/${mediaType}?query=${encodeURIComponent(query)}&page=${page}`
     );
-    return data.results ?? [];
+    return { results: data.results ?? [], totalPages: data.total_pages };
   },
 
   /**
-   * جلب تفاصيل فيلم معين بالـ ID الخاص به.
-   * append_to_response: تجلب بيانات إضافية (Cast + Similar) في طلب واحد بدلاً من 3 طلبات.
-   * @param {number|string} movieId - معرف الفيلم
-   * @returns {Promise<MovieDetail>}
+   * جلب تفاصيل عمل معين بالـ ID الخاص به.
+   * @param {string} mediaType - نوع العمل (movie أو tv)
+   * @param {number|string} id - معرف العمل
+   * @returns {Promise<any>}
    */
-  fetchMovieDetails: async (movieId) => {
+  fetchMediaDetails: async (mediaType, id) => {
     const data = await _fetchFromTMDB(
-      `${API_BASE_URL}/movie/${movieId}?append_to_response=credits,similar,videos`
+      `${API_BASE_URL}/${mediaType}/${id}?append_to_response=credits,similar,videos,watch/providers,images&include_image_language=en,null`
+    );
+    return data;
+  },
+
+  /**
+   * جلب تفاصيل الممثل/الشخص مع أعماله
+   * @param {number|string} id - معرف الشخص
+   * @returns {Promise<any>}
+   */
+  fetchPersonDetails: async (id) => {
+    const data = await _fetchFromTMDB(
+      `${API_BASE_URL}/person/${id}?append_to_response=combined_credits,images`
     );
     return data;
   },

@@ -34,23 +34,21 @@ const useMovieDetailStore = create((set) => ({
   // ═══════════ الأفعال (Actions) ═══════════
 
   /**
-   * جلب تفاصيل فيلم معين بمعرفه (ID).
+   * جلب تفاصيل عمل فني معين بمعرفه (ID) ونوعه (mediaType).
    *
-   * 🧠 المعامل movieId يأتي من React Router عبر useParams().
-   *    مثال: إذا فتح المستخدم /movie/550 → movieId = "550"
-   *
-   * @param {string|number} movieId - معرف الفيلم في TMDB
+   * @param {string} mediaType - نوع العمل ('movie' أو 'tv')
+   * @param {string|number} mediaId - معرف العمل في TMDB
    */
-  fetchMovieDetail: async (movieId) => {
-    if (!movieId) return;
+  fetchMediaDetail: async (mediaType, mediaId) => {
+    if (!mediaId) return;
 
     set({ isLoading: true, error: '' });
 
     try {
-      const data = await tmdbService.fetchMovieDetails(movieId);
+      const data = await tmdbService.fetchMediaDetails(mediaType, mediaId);
       set({ movie: data });
     } catch (err) {
-      console.error('[MovieDetailStore] fetchMovieDetail failed:', err);
+      console.error('[MovieDetailStore] fetchMediaDetail failed:', err);
       set({ error: i18n.t('error.fetch_details') });
     } finally {
       set({ isLoading: false });

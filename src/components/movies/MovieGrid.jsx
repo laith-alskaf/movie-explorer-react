@@ -23,15 +23,24 @@
  */
 
 import MovieCard from './MovieCard';
-import Spinner from '../ui/Spinner';
+import MovieCardSkeleton from './MovieCardSkeleton';
 import ErrorMessage from '../ui/ErrorMessage';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeInUp } from '../../utils/animations';
 
 const MovieGrid = ({ movies, isLoading, errorMessage }) => {
   if (isLoading) {
+    // عرض 8 هياكل تحميل وهمية (Skeletons) لتحسين شكل التطبيق
+    const skeletons = Array.from({ length: 8 }, (_, index) => index);
+    
     return (
-      <div className="flex justify-center py-20">
-        <Spinner />
-      </div>
+      <ul className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {skeletons.map((index) => (
+          <li key={index}>
+            <MovieCardSkeleton />
+          </li>
+        ))}
+      </ul>
     );
   }
 
@@ -48,13 +57,20 @@ const MovieGrid = ({ movies, isLoading, errorMessage }) => {
   }
 
   return (
-    <ul className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <motion.ul 
+      className="grid grid-cols-1 gap-5 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      // Added layout so grid reorganizes smoothly when items are filtered
+      layout
+    >
       {movies.map((movie) => (
-        <li key={movie.id}>
+        <motion.li key={movie.id} variants={fadeInUp} layout>
           <MovieCard movie={movie} />
-        </li>
+        </motion.li>
       ))}
-    </ul>
+    </motion.ul>
   );
 };
 

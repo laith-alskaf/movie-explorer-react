@@ -17,9 +17,7 @@ import useMovieStore from '../../store/useMovieStore';
 
 const Navbar = () => {
   const { t } = useTranslation();
-  //useLocation() يعطينا الرابط الحالي لتلوين الرابط النشط (Active Link)
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
 
   // جلب دوال إعادة الضبط من المتجر
   const setSearchTerm = useMovieStore((state) => state.setSearchTerm);
@@ -28,7 +26,6 @@ const Navbar = () => {
 
   // دالة تُنفذ عند الضغط على زر "الرئيسية" أو الشعار
   const handleHomeClick = () => {
-    setIsOpen(false);
     setSearchTerm(''); // تفريغ البحث
     setSelectedGenreId(''); // تفريغ تصنيف الأفلام
     setSortBy('popularity.desc'); // إعادة الترتيب للافتراضي
@@ -59,23 +56,9 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* أدوات الموبايل (اللغة + زر الهمبرغر) - تظهر فقط في الشاشات الصغيرة */}
+        {/* أدوات الموبايل (اللغة) - تظهر فقط في الشاشات الصغيرة */}
         <div className="flex items-center gap-3 md:hidden">
           <LanguageSwitcher />
-          
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/5 focus:outline-none"
-            aria-label="Toggle Menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
         </div>
 
         {/* روابط التصفح - شاشات الكمبيوتر */}
@@ -89,6 +72,15 @@ const Navbar = () => {
           >
             {t('nav.home')}
           </Link>
+
+          <Link
+            to="/favorites"
+            className={`text-sm font-medium tracking-wide transition-colors duration-250 flex items-center gap-1.5 ${
+              location.pathname === '/favorites' ? 'text-[#AB8BFF]' : 'text-light-200 hover:text-white'
+            }`}
+          >
+            <span>المفضلة</span>
+          </Link>
           
           <a
             href="#developer-profile"
@@ -101,33 +93,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* القائمة المنسدلة - شاشات الموبايل */}
-      <div 
-        className={`md:hidden absolute top-full start-0 w-full bg-[#030014]/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300 overflow-hidden shadow-2xl ${
-          isOpen ? 'max-h-60 py-5 opacity-100' : 'max-h-0 py-0 opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="flex flex-col px-5 gap-5">
-          <Link
-            to="/"
-            onClick={handleHomeClick}
-            className={`text-base font-medium tracking-wide transition-colors flex items-center gap-3 ${
-              location.pathname === '/' ? 'text-[#AB8BFF]' : 'text-light-200 hover:text-white'
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${location.pathname === '/' ? 'bg-[#AB8BFF]' : 'bg-transparent'}`}></span>
-            {t('nav.home')}
-          </Link>
-          
-          <a
-            href="#developer-profile"
-            onClick={() => setIsOpen(false)}
-            className="text-base font-medium w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-light-200 hover:text-white hover:bg-white/10 transition-all text-center"
-          >
-            {t('nav.developer')}
-          </a>
-        </div>
-      </div>
     </nav>
   );
 };

@@ -31,42 +31,57 @@
  *   هذا يُقسّم الكود (Code Splitting) ويُسرّع التحميل الأول.
  */
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { pageTransition } from './utils/animations';
 import Navbar from './components/layout/Navbar';
+import MobileBottomNav from './components/layout/MobileBottomNav';
 import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import MovieDetailPage from './pages/MovieDetailPage';
+import FavoritesPage from './pages/FavoritesPage';
+import PersonDetailPage from './pages/PersonDetailPage';
 
 const App = () => {
+  const location = useLocation();
   return (
     <div className="min-h-screen bg-primary flex flex-col text-white">
       {/* شريط التنقل العلوي المشترك */}
       <Navbar />
 
       {/* مساحة عرض المحتوى الديناميكي للصفحات */}
-      <div className="flex-grow">
-        <Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
           {/* الصفحة الرئيسية */}
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<motion.div variants={pageTransition} initial="hidden" animate="visible" exit="exit"><HomePage /></motion.div>} />
 
-          {/* صفحة تفاصيل الفيلم — :id يُستبدل بمعرف الفيلم الفعلي */}
-          <Route path="/movie/:id" element={<MovieDetailPage />} />
+          {/* صفحة المفضلة */}
+          <Route path="/favorites" element={<motion.div variants={pageTransition} initial="hidden" animate="visible" exit="exit"><FavoritesPage /></motion.div>} />
 
-          {/* صفحة 404 — لأي مسار غير معرّف */}
+          {/* صفحة تفاصيل العمل */}
+          <Route path="/:mediaType/:id" element={<motion.div variants={pageTransition} initial="hidden" animate="visible" exit="exit"><MovieDetailPage /></motion.div>} />
+
+          {/* صفحة تفاصيل الممثل */}
+          <Route path="/person/:id" element={<motion.div variants={pageTransition} initial="hidden" animate="visible" exit="exit"><PersonDetailPage /></motion.div>} />
+
+          {/* صفحة 404 */}
           <Route
             path="*"
             element={
-              <div className="h-[60vh] flex flex-col items-center justify-center text-white gap-4">
+              <motion.div variants={pageTransition} initial="hidden" animate="visible" exit="exit" className="h-[60vh] flex flex-col items-center justify-center text-white gap-4">
                 <h1 className="text-6xl font-bold text-[#AB8BFF]">404</h1>
                 <p className="text-light-200">الصفحة غير موجودة</p>
                 <a href="/" className="px-6 py-2 bg-[#AB8BFF] rounded-lg font-semibold hover:bg-[#9775e8] transition-colors">
                   العودة للرئيسية
                 </a>
-              </div>
+              </motion.div>
             }
           />
         </Routes>
-      </div>
+      </AnimatePresence>
+
+      {/* شريط التنقل السفلي للموبايل */}
+      <MobileBottomNav />
 
       {/* التذييل السفلي وبطاقة المطور المشتركة */}
       <Footer />

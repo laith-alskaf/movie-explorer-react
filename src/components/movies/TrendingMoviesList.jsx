@@ -10,6 +10,8 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeInUp } from '../../utils/animations';
 
 const TrendingMoviesList = ({ movies }) => {
   const { t } = useTranslation();
@@ -25,9 +27,14 @@ const TrendingMoviesList = ({ movies }) => {
         </h2>
       </div>
 
-      <ul>
+      <motion.ul
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
         {movies.map((movie, index) => (
-          <li key={movie.$id} className="relative group">
+          <motion.li key={movie.$id} variants={fadeInUp} className="relative group">
             {/* الرقم التسلسلي الفاخر */}
             <p className="select-none">{index + 1}</p>
 
@@ -39,9 +46,9 @@ const TrendingMoviesList = ({ movies }) => {
                 className="w-[127px] h-[163px] rounded-xl object-cover -ml-3.5 border border-white/5 transition-all duration-300 group-hover:scale-105 group-hover:border-[#AB8BFF]/40 group-hover:shadow-[0_8px_20px_rgba(171,139,255,0.2)]"
               />
             </Link>
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     </section>
   );
 };

@@ -35,6 +35,8 @@ import MovieGrid from '../components/movies/MovieGrid';
 import TrendingMoviesList from '../components/movies/TrendingMoviesList';
 import GenreFilter from '../components/movies/GenreFilter';
 import SortSelector from '../components/movies/SortSelector';
+import AdvancedFilters from '../components/movies/AdvancedFilters';
+import HeroSection from '../components/home/HeroSection';
 
 const HomePage = () => {
   // ═══════════════════════════════════════════════════════════
@@ -51,16 +53,24 @@ const HomePage = () => {
   const searchTerm = useMovieStore((s) => s.searchTerm);
   const selectedGenreId = useMovieStore((s) => s.selectedGenreId);
   const sortBy = useMovieStore((s) => s.sortBy);
+  const mediaType = useMovieStore((s) => s.mediaType);
   const movies = useMovieStore((s) => s.movies);
   const genres = useMovieStore((s) => s.genres);
   const isLoading = useMovieStore((s) => s.isLoading);
   const errorMessage = useMovieStore((s) => s.errorMessage);
+  const hasMore = useMovieStore((s) => s.hasMore);
+  const isLoadingMore = useMovieStore((s) => s.isLoadingMore);
+  
+  const filterYear = useMovieStore((s) => s.filterYear);
+  const filterRating = useMovieStore((s) => s.filterRating);
+  const filterLanguage = useMovieStore((s) => s.filterLanguage);
 
   // قراءة الأفعال (Actions) من المتجر
   const setSelectedGenreId = useMovieStore((s) => s.setSelectedGenreId);
   const setSortBy = useMovieStore((s) => s.setSortBy);
   const fetchGenres = useMovieStore((s) => s.fetchGenres);
   const fetchMovies = useMovieStore((s) => s.fetchMovies);
+  const loadMoreMovies = useMovieStore((s) => s.loadMoreMovies);
 
   // قراءة الأفلام الشائعة من متجر منفصل
   const trendingMovies = useTrendingStore((s) => s.trendingMovies);
@@ -79,7 +89,7 @@ const HomePage = () => {
     fetchGenres();
     fetchMovies();
     fetchTrending();
-  }, [language]);
+  }, [language, mediaType]);
 
   // ═══════════════════════════════════════════════════════════
   //   الـ Debounce للبحث
@@ -99,12 +109,17 @@ const HomePage = () => {
   // ═══════════════════════════════════════════════════════════
 
   /**
-   * 🧠 عندما يغيّر المستخدم التصنيف أو الترتيب، نجلب الأفلام فوراً (بدون Debounce).
+   * 🧠 عندما يغيّر المستخدم التصنيف أو الترتيب أو الفلاتر المتقدمة، نجلب الأفلام فوراً (بدون Debounce).
    *    لأن هذه ليست كتابة مستمرة — بل ضغطة واحدة = طلب واحد.
    */
   useEffect(() => {
     fetchMovies();
-  }, [selectedGenreId, sortBy]);
+  }, [selectedGenreId, sortBy, filterYear, filterRating, filterLanguage]);
+
+  // ═══════════════════════════════════════════════════════════
+
+  // تم إزالة التمرير اللانهائي (Infinite Scrolling) التلقائي
+  // واستبداله بزر "عرض المزيد" بناءً على طلب المستخدم لتحسين الوصول للتذييل (Footer)
 
   // ═══════════════════════════════════════════════════════════
   //   واجهة العرض (JSX)
@@ -116,32 +131,8 @@ const HomePage = () => {
 
       <div className="wrapper">
 
-        {/* ترويسة البداية (Hero Section): كارت سينمائي عريض */}
-        <header className="relative w-full rounded-3xl overflow-hidden bg-linear-to-b from-[#120a2b]/30 to-[#030014]/50 border border-white/5 backdrop-blur-md p-8 md:p-14 mb-10 shadow-2xl flex flex-col items-center text-center min-h-[380px] justify-center">
-
-          {/* خلفية البانر المندمجة والمضببة */}
-          <div className="absolute inset-0 z-0 pointer-events-none opacity-20 select-none">
-            <img
-              src="./hero.png"
-              alt="Hero Background"
-              className="w-full h-full object-cover scale-105 filter blur-xs"
-            />
-            <div className="absolute inset-0 bg-[#030014]/80 bg-gradient-to-t from-[#030014] via-transparent to-transparent" />
-          </div>
-
-          <div className="relative z-10 w-full max-w-3xl flex flex-col gap-6">
-            {/* الشارة الترحيبية الدائرية */}
-            <div className="mx-auto flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full shadow-sm max-w-max">
-              <span className="w-2 h-2 rounded-full bg-[#AB8BFF] animate-pulse" />
-              <span className="text-[10px] font-black text-white uppercase tracking-widest">CINEWAVE HUB</span>
-            </div>
-
-            <TypingHeader />
-
-            {/* 🧠 Search لم يعد يحتاج Props! يقرأ من المتجر مباشرة */}
-            <Search />
-          </div>
-        </header>
+        {/* ترويسة البداية (Hero Section) الفاخرة */}
+        <HeroSection />
 
         {/* قسم كبسولات تصفية الأفلام */}
         <GenreFilter
@@ -161,18 +152,43 @@ const HomePage = () => {
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-wide">
                 {selectedGenreId
                   ? `${genres.find((g) => g.id === selectedGenreId)?.name || ''}`
-                  : t('home.all_movies')}
+                  : (mediaType === 'movie' ? t('home.all_movies') : t('features.all_series'))}
               </h2>
             </div>
             {/* منتقي الترتيب الفاخر */}
             <SortSelector sortBy={sortBy} onChangeSort={setSortBy} />
           </div>
 
+          {/* الفلاتر المتقدمة (سنة، تقييم، لغة) */}
+          <div className="mb-8">
+            <AdvancedFilters />
+          </div>
+
           <MovieGrid
             movies={movies}
-            isLoading={isLoading}
+            isLoading={isLoading && !isLoadingMore}
             errorMessage={errorMessage}
           />
+
+          {/* زر تحميل المزيد */}
+          {!isLoading && !errorMessage && hasMore && movies.length > 0 && (
+            <div className="flex justify-center py-12">
+              <button
+                onClick={loadMoreMovies}
+                disabled={isLoadingMore}
+                className="px-8 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold tracking-wider hover:bg-white/10 hover:border-[#AB8BFF]/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+              >
+                {isLoadingMore ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>{t('features.loading')}</span>
+                  </>
+                ) : (
+                  <span>{t('features.load_more')}</span>
+                )}
+              </button>
+            </div>
+          )}
         </section>
 
       </div>
