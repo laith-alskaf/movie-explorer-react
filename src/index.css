@@ -22,8 +22,9 @@
 }
 
 @layer base {
-  html, body {
+  html, body, #root {
     width: 100%;
+    max-width: 100vw;
     overflow-x: hidden;
   }
   
@@ -66,7 +67,7 @@
     @apply mt-20;
 
     & ul {
-      @apply flex flex-row overflow-y-auto gap-5 -mt-10 w-full hide-scrollbar;
+      @apply flex flex-row overflow-x-auto gap-5 -mt-10 w-full hide-scrollbar;
     }
 
     & ul li {
