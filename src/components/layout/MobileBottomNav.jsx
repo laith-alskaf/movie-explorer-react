@@ -25,7 +25,7 @@ const MobileBottomNav = () => {
   };
 
   return (
-    <div className="md:hidden fixed bottom-4 start-1/2 -translate-x-1/2 z-50 w-[90%] max-w-[400px]">
+    <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-[400px]">
       <div className="bg-[#030014]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 flex items-center justify-around shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
         
         {/* زر الرئيسية */}
