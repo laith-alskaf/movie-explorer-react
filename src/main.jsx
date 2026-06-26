@@ -29,6 +29,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import './i18n'; // Initialize i18n
 import { LanguageProvider } from './contexts/LanguageContext';
+import { HelmetProvider } from 'react-helmet-async';
 import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
@@ -37,10 +38,12 @@ createRoot(document.getElementById('root')).render(
       BrowserRouter يُغلّف التطبيق كله.
       يستخدم HTML5 History API للتنقل بين الصفحات بدون إعادة تحميل.
     */}
-    <BrowserRouter>
-      <LanguageProvider>
-        <App />
-      </LanguageProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <LanguageProvider>
+          <App />
+        </LanguageProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   </StrictMode>
 );

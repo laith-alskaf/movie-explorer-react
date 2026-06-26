@@ -37,6 +37,7 @@ import { pageTransition } from './utils/animations';
 import Navbar from './components/layout/Navbar';
 import MobileBottomNav from './components/layout/MobileBottomNav';
 import Footer from './components/layout/Footer';
+import ScrollToTop from './components/layout/ScrollToTop';
 import HomePage from './pages/HomePage';
 import MovieDetailPage from './pages/MovieDetailPage';
 import FavoritesPage from './pages/FavoritesPage';
@@ -48,6 +49,8 @@ const App = () => {
     <div className="min-h-screen bg-primary flex flex-col text-white">
       {/* شريط التنقل العلوي المشترك */}
       <Navbar />
+
+      <ScrollToTop />
 
       {/* مساحة عرض المحتوى الديناميكي للصفحات */}
       <AnimatePresence mode="wait">

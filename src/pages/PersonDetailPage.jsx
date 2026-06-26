@@ -7,6 +7,7 @@ import tmdbService from '../services/tmdb.service';
 import Spinner from '../components/ui/Spinner';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import ImageModal from '../components/ui/ImageModal';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { slideInLeft, slideInRight, staggerContainer, fadeInUp } from '../utils/animations';
 import { useState } from 'react';
@@ -62,6 +63,14 @@ const PersonDetailPage = () => {
 
   return (
     <main className="min-h-screen bg-[#030014] py-8 md:py-14 px-5 relative overflow-hidden">
+      <Helmet>
+        <title>{name} - CineWave</title>
+        <meta name="description" content={biography ? biography.substring(0, 150) + '...' : `Details about ${name} on CineWave`} />
+        <meta property="og:title" content={`${name} - CineWave`} />
+        <meta property="og:description" content={biography ? biography.substring(0, 150) + '...' : ''} />
+        <meta property="og:image" content={tmdbService.getImageUrl(profile_path, 'w500')} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
       
       {/* خلفية زجاجية تجميلية */}
       <div className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-[#AB8BFF] rounded-full mix-blend-multiply filter blur-[150px] opacity-10 pointer-events-none" />

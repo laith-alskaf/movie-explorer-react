@@ -24,6 +24,7 @@ import WatchProviders from '../components/movies/WatchProviders';
 import ImageGallery from '../components/movies/ImageGallery';
 import SeasonsList from '../components/movies/SeasonsList';
 import ImageModal from '../components/ui/ImageModal';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeInUp, slideInLeft, slideInRight, staggerContainer, scaleUp } from '../utils/animations';
 
@@ -124,6 +125,14 @@ const MovieDetailPage = () => {
 
   return (
     <main className="min-h-screen bg-[#030014] relative overflow-hidden">
+      <Helmet>
+        <title>{displayTitle} - CineWave</title>
+        <meta name="description" content={overview ? overview.substring(0, 150) + '...' : `Watch ${displayTitle} on CineWave`} />
+        <meta property="og:title" content={`${displayTitle} - CineWave`} />
+        <meta property="og:description" content={overview ? overview.substring(0, 150) + '...' : ''} />
+        <meta property="og:image" content={tmdbService.getImageUrl(poster_path, 'w500')} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
 
       {/* خلفية البوستر الكبيرة للفيلم مع قناع تعتيم متدرج */}
       {backdrop_path && (

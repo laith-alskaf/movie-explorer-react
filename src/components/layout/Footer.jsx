@@ -71,7 +71,8 @@ const Footer = () => {
           {/* الجانب الأيسر (بطاقة المطور) - يأخذ 4 أعمدة */}
           <motion.div variants={fadeInUp} className="md:col-span-4 w-full flex justify-center md:justify-end">
             <div 
-              className="w-full max-w-sm p-5 rounded-2xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/10 backdrop-blur-xl relative overflow-hidden group hover:border-[#AB8BFF]/30 transition-all duration-500 shadow-xl"
+              id="developer-profile"
+              className="w-full max-w-sm p-5 rounded-2xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/10 backdrop-blur-xl relative overflow-hidden group hover:border-[#AB8BFF]/30 transition-all duration-500 shadow-xl scroll-mt-24"
             >
               {/* إضاءة خلفية نيونية */}
               <div className="absolute -right-12 -top-12 w-32 h-32 bg-[#AB8BFF]/10 rounded-full blur-3xl group-hover:bg-[#AB8BFF]/20 transition-all duration-700" />

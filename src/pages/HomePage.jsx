@@ -23,6 +23,7 @@ import { useEffect } from 'react';
 import { useDebounce } from 'react-use';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 
 // ═══ المتاجر المركزية (Zustand Stores) ═══
 import useMovieStore from '../store/useMovieStore';
@@ -127,6 +128,12 @@ const HomePage = () => {
 
   return (
     <main>
+      <Helmet>
+        <title>{t('home.title') || 'CineWave - Discover Premium Movies & TV Shows'}</title>
+        <meta name="description" content={t('footer.description') || 'Discover the best and most trending movies and TV shows on CineWave. Experience premium cinematic UI and find your favorites.'} />
+        <meta name="keywords" content="movies, tv shows, trending, cinewave, tmdb, cinematic, watch, streaming" />
+      </Helmet>
+      
       <div className="pattern" />
 
       <div className="wrapper">
