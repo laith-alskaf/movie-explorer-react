@@ -45,7 +45,7 @@ import PersonDetailPage from './pages/PersonDetailPage';
 const App = () => {
   const location = useLocation();
   return (
-    <div className="min-h-screen bg-primary flex flex-col text-white">
+    <div className="min-h-screen bg-primary flex flex-col text-white overflow-x-hidden relative">
       {/* شريط التنقل العلوي المشترك */}
       <Navbar />
 
