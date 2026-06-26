@@ -22,6 +22,11 @@
 }
 
 @layer base {
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
   body {
     font-family: "Cairo", "Plus Jakarta Sans", sans-serif;
     background: #030014;
